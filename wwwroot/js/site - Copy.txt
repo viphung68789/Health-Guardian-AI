@@ -1,0 +1,334 @@
+﻿
+// Write your JavaScript code.
+// ---- State ----
+//let authMode = 'login';
+let waterGlasses = 0;
+let hypertension = false;
+let heartDisease = false;
+let diabetes = false;
+//let currentUser = null;
+
+
+// ---- Auth ----
+function showAuth(mode) {
+    switchAuthMode(mode);
+    document.getElementById('auth-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function switchAuthMode(mode) {
+    const isRegister = (mode === 'register');
+    // Ẩn/Hiện form tương ứng
+    document.getElementById('login-form').classList.toggle('hidden', isRegister);
+    document.getElementById('register-form').classList.toggle('hidden', !isRegister);
+    // Cập nhật giao diện Tab (Active màu trắng)
+    document.getElementById('tab-login').classList.toggle('bg-white', !isRegister);
+    document.getElementById('tab-register').classList.toggle('bg-white', isRegister);
+    // Cập nhật Tiêu đề
+    document.getElementById('auth-title').textContent = isRegister ? 'Khởi tạo tài khoản mới' : 'Chào mừng trở lại';
+}
+
+// ---- Tab Switching ----
+function switchTab(tab) {
+    ['dashboard', 'profile', 'predict', 'history', 'chatbot'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+        document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
+    });
+
+    if (tab === 'chatbot') {
+        loadChatHistory();
+    }
+}
+// ---- Water Widget ----
+function addWater() { waterGlasses = Math.min(waterGlasses + 1, 20); updateWaterDisplay(); }
+function removeWater() { waterGlasses = Math.max(waterGlasses - 1, 0); updateWaterDisplay(); }
+function updateWaterDisplay() { document.getElementById('water-count').textContent = waterGlasses; }
+
+// ---- Reminders ----
+function addReminder() {
+    const name = document.getElementById('new-med-name').value.trim();
+    const time = document.getElementById('new-med-time').value;
+    if (!name) return;
+    const list = document.getElementById('reminders-list');
+    const div = document.createElement('div');
+    div.className = 'flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 gap-1.5';
+    div.innerHTML = `<div class="flex items-start gap-1.5"><input type="checkbox" class="mt-1 accent-indigo-600 rounded" /><div><span class="block text-[0.7rem] font-bold text-slate-800">${name}</span><span class="text-[0.625rem] text-indigo-600 font-mono">${time}</span></div></div><button onclick="this.closest('div').remove()" class="text-slate-400 hover:text-red-500 p-1 rounded"><svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg></button>`;
+    list.appendChild(div);
+    document.getElementById('new-med-name').value = '';
+}
+
+// ---- Profile: BMI ----
+function updateBmi() {
+    const h = parseFloat(document.getElementById('profile-height').value) || 170;
+    const w = parseFloat(document.getElementById('profile-weight').value) || 68;
+    const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+    document.getElementById('live-bmi').textContent = bmi;
+    let label, cls;
+    if (bmi < 18.5) { label = 'Thiếu cân'; cls = 'text-sky-600 bg-sky-50 border-sky-200'; }
+    else if (bmi < 25) { label = 'Bình thường'; cls = 'text-emerald-600 bg-emerald-50 border-emerald-200'; }
+    else if (bmi < 30) { label = 'Thừa cân'; cls = 'text-orange-600 bg-orange-50 border-orange-200'; }
+    else { label = 'Béo phì (Báo động)'; cls = 'text-red-700 bg-red-50 border-red-200'; }
+    const lbl = document.getElementById('live-bmi-label');
+    lbl.textContent = label;
+    lbl.className = `inline-block px-3 py-1 text-xs font-extrabold border rounded-full ${cls}`;
+}
+//Huyết Áp
+function toggleHypertension() {
+    hypertension = !hypertension;
+    const card = document.getElementById('hypertension-card');
+    const chk = document.getElementById('hypertension-check');
+    card.className = `p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition ${hypertension ? 'border-red-400 bg-red-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`;
+    chk.className = `w-6 h-6 rounded-full flex items-center justify-center border-2 ${hypertension ? 'bg-red-500 border-red-500' : 'border-slate-300 text-transparent'}`;
+}
+//Tim mạch
+function toggleHeartDisease() {
+    heartDisease = !heartDisease;
+    const card = document.getElementById('heart-disease-card');
+    const chk = document.getElementById('heart-disease-check');
+    card.className = `p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition ${heartDisease ? 'border-red-400 bg-red-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`;
+    chk.className = `w-6 h-6 rounded-full flex items-center justify-center border-2 ${heartDisease ? 'bg-red-500 border-red-500' : 'border-slate-300 text-transparent'}`;
+}
+//Tiểu đường
+function toggleDiabetes() {
+    diabetes = !diabetes;
+    const card = document.getElementById('diabetes-card');
+    const chk = document.getElementById('diabetes-check');
+    card.className = `p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition ${diabetes ? 'border-red-400 bg-red-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`;
+    chk.className = `w-6 h-6 rounded-full flex items-center justify-center border-2 ${diabetes ? 'bg-red-500 border-red-500' : 'border-slate-300 text-transparent'}`;
+    const glucoInput = document.getElementById('glucose-input');
+    if (glucoInput) {
+        if (diabetes) {
+            glucoInput.classList.remove('hidden');
+        } else {
+            glucoInput.classList.add('hidden');
+        }
+    }
+}
+//Lưu profile siêu cấp của bệnh nhân
+async function handleSaveProfile(e) {
+    e.preventDefault();
+    console.log("Button clicked");
+
+    const profileData = {
+        Age: parseFloat(document.getElementById('profile-age').value),
+        Gender: document.getElementById('profile-gender').value,
+
+        SES: document.getElementById('profile-ses').value,
+
+        Height: parseFloat(document.getElementById('profile-height').value),
+        Weight: parseFloat(document.getElementById('profile-weight').value),
+
+        SmokingStatus: document.getElementById('profile-smoking').value,
+
+        Hypertension: hypertension,
+        HeartDisease: heartDisease,
+        Diabetes: diabetes,
+
+        AvgGlucose: parseFloat(
+            document.getElementById('num-glucose').value)
+    };
+    console.log(profileData);
+    const response = await fetch('/Dashboard/SaveProfile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        alert('Đã lưu hồ sơ thành công! BMI của bạn là: ' + result.bmi);
+        const predict1 = document.getElementById("predict-card1").classList.remove("hidden");
+        const predict2 = document.getElementById("predict-card2").classList.add("hidden");
+    }
+    //Code của Long stupid ngu như con chó
+    predictStroke();
+}
+
+// ---- Chatbot ----
+function setWelcomeTime() {
+    const t = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const el = document.getElementById('welcome-time');
+    if (el) el.textContent = t;
+}
+
+function sendQuickMessage(msg) {
+    document.getElementById('chat-input').value = msg;
+    sendChatMessage();
+}
+
+async function loadChatHistory() {
+    try {
+        const response = await fetch('/Chat/GetHistory');
+        if (response.ok) {
+            const history = await response.json();
+            const container = document.getElementById('chat-messages');
+            // Giữ lại tin nhắn chào mừng đầu tiên nếu muốn, hoặc xóa hết
+            container.innerHTML = ''; 
+            history.forEach(msg => {
+                appendChatMessage(msg.role, msg.message, msg.time);
+            });
+        }
+    } catch (error) {
+        console.error("Không thể tải lịch sử chat:", error);
+    }
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    
+    input.value = '';
+    appendChatMessage('user', msg);
+
+    // Hiệu ứng đang trả lời
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typing-indicator';
+    typingDiv.className = 'flex gap-3 max-w-[85%] mr-auto';
+    typingDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <svg class="w-4 h-4 animate-bounce" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div class="p-3 bg-white border border-slate-200 rounded-2xl rounded-tl-none text-xs text-slate-400 italic shadow-sm">Bác sĩ AI đang suy nghĩ...</div>
+    `;
+    document.getElementById('chat-messages').appendChild(typingDiv);
+    document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+
+    try {
+        const response = await fetch('/Chat/SendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg })
+        });
+
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) typingIndicator.remove();
+
+        if (response.ok) {
+            const result = await response.json();
+            appendChatMessage('model', result.response);
+        } else {
+            appendChatMessage('model', 'Xin lỗi, có lỗi xảy ra khi kết nối với máy chủ AI.');
+        }
+    } catch (error) {
+        document.getElementById('typing-indicator')?.remove();
+        appendChatMessage('model', 'Lỗi mạng, vui lòng kiểm tra lại kết nối.');
+    }
+}
+
+function appendChatMessage(role, content, customTime = null) {
+    const container = document.getElementById('chat-messages');
+    const time = customTime || new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const isUser = role === 'user';
+    const div = document.createElement('div');
+    div.className = `flex gap-3 max-w-[85%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`;
+    const bubbleClass = isUser
+        ? 'bg-indigo-600 border-indigo-700 text-white rounded-tr-none'
+        : 'bg-white border-slate-200 text-slate-800 rounded-tl-none ai-message-bubble';
+    div.innerHTML = `
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${isUser ? 'bg-indigo-600' : 'bg-emerald-500'} text-white">
+        ${isUser
+            ? `<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>`
+            : `<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
+        }
+    </div>
+    <div class="space-y-1">
+        <div class="p-3.5 rounded-2xl border text-l leading-relaxed ${isUser ? 'bg-indigo-600 border-indigo-700 text-white rounded-tr-none' : 'bg-white border-slate-200 text-slate-800 rounded-tl-none'}">${content}</div>
+        <span class="block text-[0.625rem] text-slate-400 font-mono ${isUser ? 'text-right' : 'text-left'}">${time}</span>
+    </div>`;
+
+    const bubble = div.querySelector('.rounded-2xl')
+    if (isUser) {
+        bubble.textContent = content; // User input: plain text, tránh XSS
+    } else {
+        bubble.innerHTML = content;   // AI response: đã là HTML từ server
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function clearChat() {
+    if (confirm('Xóa lịch sử cuộc đối thoại trợ lý tim mạch hiện tại?')) {
+        const container = document.getElementById('chat-messages');
+        container.innerHTML = '';
+        appendChatMessage('model', 'Lịch sử trò chuyện đã được thiết lập lại dọn dẹp. Tôi có thể hỗ trợ gì cho sức khỏe tim mạch của bạn?');
+    }
+}
+// Thêm đoạn này vào phần đầu hoặc hàm khởi tạo (Init) trong file site.js của bạn
+//document.addEventListener("DOMContentLoaded", function () {
+//    const appContainer = document.getElementById('app-container');
+
+//    // Đọc dữ liệu bảo mật từ Server ép xuống HTML
+//    const isLoggedIn = appContainer.getAttribute('data-is-logged-in') === 'true';
+
+//    if (isLoggedIn) {
+//        // Nếu Server bảo đã đăng nhập, tự động phục hồi phiên làm việc cho site.js
+//        currentUser = {
+//            fullName: appContainer.getAttribute('data-user-name'),
+//            role: appContainer.getAttribute('data-user-role')
+//        };
+
+//        // Gọi hàm ẩn Form đăng nhập và hiện Dashboard lên
+//        document.getElementById('auth-form').classList.add('hidden');
+//        document.getElementById('dashboard-panel').classList.remove('hidden');
+//        document.getElementById('user-display-name').textContent = currentUser.fullName;
+//    } else {
+//        // Ngược lại, bắt buộc phải ở màn hình đăng nhập
+//        currentUser = null;
+//        document.getElementById('auth-form').classList.remove('hidden');
+//        document.getElementById('dashboard-panel').classList.add('hidden');
+//    }
+//});
+//Code của Long Ngu liền :)
+async function predictStroke() {
+    //Tran lết Tiếng ziệt
+    const featureNames = {
+        Age: "Tuổi",
+        Hypertension: "Tăng huyết áp",
+        Heart_Disease: "Bệnh tim",
+        BMI: "BMI",
+        Avg_Glucose: "Đường huyết trung bình",
+        Diabetes: "Tiểu đường",
+        Gender: "Giới tính",
+        SES: "Tình trạng kinh tế - xã hội",
+        Smoking_Status: "Tình trạng hút thuốc"
+    };
+    const request = {
+        Age: parseFloat(document.getElementById('profile-age').value),
+        Hypertension: hypertension ? 1 : 0,
+        Heart_Disease: heartDisease ? 1 : 0,
+        BMI: parseFloat(
+            document.getElementById('live-bmi').textContent
+        ),
+        Avg_Glucose: parseFloat(
+            document.getElementById('num-glucose').value
+        ),
+        Diabetes: diabetes ? 1 : 0,
+        Gender: document.getElementById('profile-gender').value,
+        SES: document.getElementById('profile-ses').value,
+
+        Smoking_Status:
+            document.getElementById('profile-smoking').value
+    };
+    const response = await fetch('/Dashboard/Predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request)
+    });
+    const result = await response.json();
+    let html = `
+    <h3>Kết quả AI</h3>
+    <p>Dự đoán: ${result.prediction}</p>
+    <p>Xác suất: ${(result.probability * 100).toFixed(2)}%</p>`;
+    if (result.top_factors) {
+        html += "<h4>Yếu tố nguy cơ</h4><ul>";
+        result.top_factors.forEach(x => { const displayName = featureNames[x.feature] || x.feature; html += `<li>${displayName}</li>`; });
+        html += "</ul>";
+    }
+    document.getElementById("predict-result").innerHTML = html;
+}
+// Init
+setWelcomeTime();
+updateBmi();

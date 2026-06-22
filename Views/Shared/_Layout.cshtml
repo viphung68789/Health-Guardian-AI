@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Guardian AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="~/css/style.css" rel="stylesheet" />
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="~/lib/Chart.js/chart.umd.min.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .text-3xs { font-size: 0.625rem; line-height: 1rem; }
+    .text-2xs { font-size: 0.7rem; line-height: 1.1rem; }
+    .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @@keyframes ping { 75%,100% { transform:scale(2); opacity:0; } }
+    .animate-ping { animation: ping 1s cubic-bezier(0,0,.2,1) infinite; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .sidebar-btn.active { background-color: #eff6ff; color: #2563eb; }
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans">
+    @RenderBody()
+    @await RenderSectionAsync("Scripts", required: false)
+   <script src="~/js/site.js" defer asp-append-version="true"></script>
+</body>
+</html>
+

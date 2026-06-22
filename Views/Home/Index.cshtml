@@ -1,0 +1,164 @@
+﻿@model Health_Guardian_AI.Models.RegisterRequest;
+@* <div id="app-container"
+     data-is-logged-in="@((ViewBag.IsLoggedIn?.ToString() ?? "false").ToLower())"
+     data-user-name="@(ViewBag.UserFullName ?? "")"
+     data-user-role="@(ViewBag.UserRole ?? "")">
+</div> *@
+
+<!-- ======================================================
+     LANDING / AUTH PAGE (shown when not logged in)
+     ====================================================== -->
+<div id="landing-page">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 py-4 px-6 md:px-12 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-gradient-to-tr from-indigo-600 to-emerald-500 p-2 rounded-xl text-white shadow-md">
+          <svg class="w-6 h-6 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <div>
+          <span class="text-lg font-black text-slate-900 tracking-tight">HEALTH GUARDIAN <span class="text-indigo-600">AI</span></span>
+          <span class="block text-3xs text-slate-500 font-mono -mt-0.5">PREVENTION FIRST ENGINE</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="showAuth('login')" class="px-4 py-2 text-slate-700 text-sm font-semibold hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition">Đăng nhập</button>
+        <button onclick="showAuth('register')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md transition">Tạo tài khoản</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero + Auth -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 md:px-12 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+    
+    <!-- Left: Brand / Hero -->
+    <div class="col-span-1 lg:col-span-7 space-y-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full text-indigo-700 text-xs font-semibold">
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        Hỗ trợ tự động bằng AI Gemini thế hệ mới
+      </div>
+
+      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+        Bảo Vệ Sức Khỏe <br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500">Tầm Soát Đột Quỵ</span> Bằng Trí Tuệ Nhân Tạo
+      </h1>
+
+      <p class="text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl">
+        Đột quỵ (tai biến mạch máu não) đang có xu hướng trẻ hóa và trở thành gánh nặng sức khỏe lớn.
+        <strong>Health Guardian AI</strong> giúp bạn lập hồ sơ theo dõi nhanh chỉ số sinh học BMI, đánh giá tổng quan nguy cơ rủi ro và nhận tư vấn phác đồ lối sống thông minh 24/7 trực tiếp từ mô hình AI hàng đầu.
+      </p>
+
+      <!-- FAST Protocol Card -->
+      <div class="p-5 bg-amber-50/50 border border-amber-200/50 rounded-2xl flex gap-4">
+        <svg class="w-10 h-10 text-amber-600 shrink-0 mt-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <div class="space-y-1">
+          <p class="text-sm font-bold text-amber-900">Hãy nhớ quy tắc lâm sàng FAST phòng đột quỵ:</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+            <div class="space-y-0.5"><span class="text-xs font-bold text-amber-800">F - Face (Mặt)</span><span class="block text-2xs text-slate-500">Méo miệng, nụ cười không cân xứng</span></div>
+            <div class="space-y-0.5"><span class="text-xs font-bold text-amber-800">A - Arms (Tay)</span><span class="block text-2xs text-slate-500">Tê yếu chân tay một bên</span></div>
+            <div class="space-y-0.5"><span class="text-xs font-bold text-amber-800">S - Speech (Nói)</span><span class="block text-2xs text-slate-500">Nói ngọng, líu lưỡi, nói khó</span></div>
+            <div class="space-y-0.5"><span class="text-xs font-bold text-amber-800">T - Time (Giờ)</span><span class="block text-2xs text-slate-500">Gọi 115 lập tức, thời gian vàng!</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics row -->
+      <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+        <div class="space-y-1">
+          <span class="block text-2xl font-bold text-slate-900">100%</span>
+          <span class="block text-xs font-medium text-slate-500">Bảo mật thông tin sinh trắc</span>
+        </div>
+        <div class="space-y-1">
+          <span class="block text-2xl font-bold text-indigo-600">&lt; 3 giây</span>
+          <span class="block text-xs font-medium text-slate-500">Nhận báo cáo rủi ro chi tiết</span>
+        </div>
+        <div class="space-y-1">
+          <span class="block text-2xl font-bold text-emerald-600">Gemini 3.5</span>
+          <span class="block text-xs font-medium text-slate-500">Động cơ y khoa phân tích thông minh</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Auth Card -->
+    <div class="col-span-1 lg:col-span-5 bg-white border border-slate-200 p-8 rounded-3xl shadow-xl space-y-6">
+      <!-- Tabs -->
+      <div class="bg-slate-100 p-1.5 rounded-2xl grid grid-cols-2" id="auth-tabs">
+        <button onclick="switchAuthMode('login')" id="tab-login" class="py-3 text-sm font-bold rounded-xl transition bg-white text-indigo-950 shadow-sm">Đăng nhập</button>
+        <button onclick="switchAuthMode('register')" id="tab-register" class="py-3 text-sm font-bold rounded-xl transition text-slate-500 hover:text-slate-800">Đăng ký thành viên</button>
+      </div>
+
+      <!-- Title -->
+      <div class="space-y-1 text-center">
+        <h2 id="auth-title" class="text-xl font-bold text-slate-950">Chào mừng trở lại</h2>
+        <p id="auth-subtitle" class="text-xs text-slate-500">Điền mật khẩu và email để truy cập dashboard</p>
+      </div>
+
+      <!-- Error / Success -->
+      <div id="auth-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+        <svg class="w-4 h-4 text-red-500 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+        <span id="auth-error-msg"></span>
+      </div>
+      <div id="auth-success" class="hidden p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
+        <svg class="w-4 h-4 text-emerald-500 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span id="auth-success-msg"></span>
+      </div>
+            <!-- FORM ĐĂNG NHẬP -->
+      <form id="login-form" action="/Home/Login" method="post" class="space-y-4">
+        <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-700 block">Địa chỉ Email</label>
+            <input type="email" name="Email" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+        </div>
+        <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-700 block">Mật khẩu</label>
+            <input type="password" name="Password" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+        </div>
+        @if(ViewBag.Error != null){
+                    <div style="color:red">@ViewBag.Error</div>
+        }
+            <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition flex justify-center items-center gap-2 cursor-pointer">Bắt đầu đăng nhập</button>
+      </form>
+
+    <!-- FORM ĐĂNG KÝ (Mặc định ẩn) -->
+    <form id="register-form" action="/Home/Register" method="post" class="space-y-4 hidden">
+        <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-700 block">Họ và tên</label>
+            <input type="text" name="FullName" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+        </div>
+        <div class="space-y-1.5">
+            <label class="text-xs font-bold text-slate-700 block">Địa chỉ Email</label>
+            <span class="absolute left-3 top-3.5 text-slate-400 text-sm font-semibold">@@</span>
+            <input type="email" name="Email" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+        </div>
+        <div class="space-y-1.5">
+        <label class="text-xs font-bold text-slate-700 block">Mật khẩu</label>
+        <input type="password" name="Password" required class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+    </div>
+        @if(ViewBag.Error != null){
+                    <div style="color:red">@ViewBag.Error</div>
+        }
+        <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition flex justify-center items-center gap-2 cursor-pointer">Khởi tạo tài khoản mới</button>
+    </form>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 px-12 text-center text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <p>© 2026 Health Guardian AI. Hệ thống hỗ trợ y đức, tầm soát sức khỏe cá nhân kết hợp xử lý thông minh.</p>
+      <div class="flex gap-4">
+        <span class="hover:text-slate-800 cursor-pointer">Bảo mật</span>
+        <span class="hover:text-slate-800 cursor-pointer">Điều khoản sử dụng</span>
+        <span class="hover:text-slate-800 cursor-pointer">Hỗ trợ y tế khẩn cấp 115</span>
+      </div>
+    </div>
+  </footer>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Nếu Server báo đang ở chế độ register thì switch sang
+        var mode = "@ViewBag.AuthMode";
+        if(mode === "register") {
+            switchAuthMode("register");
+        }
+    });
+</script>
+

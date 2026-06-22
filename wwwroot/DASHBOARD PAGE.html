@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Guardian AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .text-3xs { font-size: 0.625rem; line-height: 1rem; }
+    .text-2xs { font-size: 0.7rem; line-height: 1.1rem; }
+    .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes ping { 75%,100% { transform:scale(2); opacity:0; } }
+    .animate-ping { animation: ping 1s cubic-bezier(0,0,.2,1) infinite; }
+    .tab-content { display: block; }
+    .tab-content.active { display: block; }
+    .sidebar-btn.active { background-color: #eff6ff; color: #2563eb; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans">
+
+<!-- ======================================================
+     DASHBOARD PAGE (shown after login)
+     ====================================================== -->
+<div id="dashboard-page" class="min-h-screen bg-slate-50 flex flex-col">
+
+  <!-- Top Nav -->
+  <header class="bg-white text-slate-800 border-b border-slate-200 py-4 px-6 md:px-8 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 p-2 rounded-xl text-white shadow-md shadow-blue-100">
+          <svg class="w-5 h-5 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <div>
+          <span class="text-base font-semibold tracking-tight font-display text-slate-900">HEALTH GUARDIAN <span class="text-blue-600 font-black">AI</span></span>
+          <p class="text-3xs text-slate-400 font-mono -mt-0.5 tracking-tight uppercase">Prevention First Engine</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 md:gap-6">
+        <div class="hidden md:flex flex-col items-end">
+          <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="user-fullname">Nguyễn Văn A</span>
+          </span>
+          <span class="text-3xs text-slate-400 font-medium" id="user-email">user@example.com</span>
+        </div>
+        <button onclick="handleLogout()" class="px-3.5 py-2 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-xl transition flex items-center gap-1.5 text-xs font-bold border border-slate-200 hover:border-red-100 cursor-pointer">
+          <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="hidden md:inline">Đăng xuất</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout: sidebar + content -->
+  <div class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- SIDEBAR -->
+    <aside class="col-span-1 lg:col-span-3 space-y-6">
+
+      <!-- Nav Menu -->
+      <div class="bg-white border border-slate-200 rounded-3xl p-5 space-y-4 shadow-sm">
+        <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">Danh mục chức năng</h3>
+          <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-3xs font-black rounded-full uppercase border border-emerald-200">Bác Sĩ AI</span>
+        </div>
+        <nav class="space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-btn active w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-50">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              <span>Trang chủ Dashboard</span>
+            </div>
+          </button>
+          <button onclick="switchTab('profile')" id="nav-profile" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-50">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+              <span>Chỉ số Hồ sơ sức khỏe</span>
+            </div>
+            <span class="text-2xs font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Cần nhập</span>
+          </button>
+          <button onclick="switchTab('predict')" id="nav-predict" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-50">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <span>Tầm soát Đột quỵ (AI)</span>
+            </div>
+          </button>
+          <button onclick="switchTab('history')" id="nav-history" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-50">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              <span>Xem lịch sử đánh giá</span>
+            </div>
+          </button>
+          <button onclick="switchTab('chatbot')" id="nav-chatbot" class="sidebar-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-50">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Trò chuyện trợ lý tim mạch</span>
+            </div>
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Hydration Widget -->
+      <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-3xl p-5 space-y-4 shadow-md">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold uppercase text-slate-300">Nhắc nhở hằng ngày</span>
+          <svg class="w-4 h-4 text-sky-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+        </div>
+        <div class="space-y-2">
+          <h4 class="text-xs font-medium text-slate-200">Lượng nước bạn uống sạch hôm nay:</h4>
+          <div class="flex items-center justify-between py-1 bg-white/10 px-3 rounded-xl">
+            <span class="text-lg font-black font-mono"><span id="water-count">0</span> / 8 <span class="text-xs font-normal text-slate-300">Cốc</span></span>
+            <div class="flex gap-1.5">
+              <button onclick="removeWater()" class="px-2 py-1 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold cursor-pointer">-</button>
+              <button onclick="addWater()" class="px-2 py-1 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-xs font-bold cursor-pointer">+</button>
+            </div>
+          </div>
+          <p class="text-3xs text-slate-300 italic">"Mất nước nhẹ làm đặc máu, gián tiếp làm tăng huyết áp và tăng nguy cơ tắc mạch!"</p>
+        </div>
+      </div>
+
+      <!-- Med Reminders Widget -->
+      <div class="bg-white border border-slate-200 rounded-3xl p-5 space-y-3 shadow-sm">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+          <span class="text-xs font-bold text-slate-900 uppercase">Lịch theo dõi / Uống thuốc</span>
+          <svg class="w-4 h-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div id="reminders-list" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+          <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 gap-1.5">
+            <div class="flex items-start gap-1.5">
+              <input type="checkbox" class="mt-1 accent-indigo-600 rounded" />
+              <div>
+                <span class="block text-2xs font-bold text-slate-800">Đo huyết áp buổi sáng</span>
+                <span class="text-3xs text-indigo-600 font-mono">08:00</span>
+              </div>
+            </div>
+            <button class="text-slate-400 hover:text-red-500 p-1 rounded transition">
+              <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+          <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 gap-1.5">
+            <div class="flex items-start gap-1.5">
+              <input type="checkbox" class="mt-1 accent-indigo-600 rounded" />
+              <div>
+                <span class="block text-2xs font-bold text-slate-800">Uống Omega-3 & kiểm tra tim mạch</span>
+                <span class="text-3xs text-indigo-600 font-mono">20:00</span>
+              </div>
+            </div>
+            <button class="text-slate-400 hover:text-red-500 p-1 rounded transition">
+              <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="space-y-1.5 pt-2 border-t border-slate-100">
+          <input type="text" id="new-med-name" placeholder="Ví dụ: Đo huyết áp hằng ngày..." class="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-400" />
+          <div class="flex gap-1.5">
+            <input type="time" id="new-med-time" value="08:00" class="text-xs p-1.5 border border-slate-200 rounded-lg outline-none font-mono flex-1 text-slate-700" />
+            <button onclick="addReminder()" class="px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold cursor-pointer">Thêm</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main class="col-span-1 lg:col-span-9 space-y-6">
+
+      <!-- TAB 1: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-content active space-y-6">
+        <!-- Setup reminder banner -->
+        <div class="p-6 bg-blue-50 border border-blue-100 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
+          <div class="space-y-1">
+            <h4 class="text-base font-semibold font-display text-blue-950">Khởi tạo hồ sơ sức khỏe của bạn</h4>
+            <p class="text-xs text-blue-800 font-medium">Bạn chưa cấu hình chiều cao, cân nặng và tiền sử bệnh lý. Hãy hoàn thiện Hồ sơ Sức khỏe ngay để AI phân tích.</p>
+          </div>
+          <button onclick="switchTab('profile')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer transition shrink-0">Thiết lập ngay</button>
+        </div>
+
+        <!-- Title -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 class="text-2xl font-bold font-display text-slate-800 tracking-tight">Kính Chào Bác Sĩ Của Gia Đình!</h1>
+            <p class="text-xs text-slate-500 font-medium">Giám sát sức khỏe chủ động từ dữ liệu sinh học và tầm soát thông minh.</p>
+          </div>
+          <button onclick="switchTab('predict')" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-100 transition cursor-pointer">
+            <svg class="w-4 h-4 text-emerald-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            Chạy Tầm Soát AI Ngay
+          </button>
+        </div>
+
+        <!-- Bento Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- BMI Card -->
+          <div class="col-span-1 md:col-span-4 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-3xl p-6 relative overflow-hidden shadow-md shadow-blue-100">
+            <div class="relative z-10 flex flex-col h-full space-y-4">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold uppercase tracking-wider opacity-80 font-display">Chỉ số hình thể (BMI)</span>
+                <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-2xl">
+                  <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                </div>
+              </div>
+              <div class="py-6 space-y-1.5 text-white/90">
+                <p class="text-sm font-bold">Chưa thiết lập BMI</p>
+                <p class="text-xs opacity-80">Hãy cập nhật cân nặng và chiều cao ở tab Hồ sơ.</p>
+              </div>
+            </div>
+            <svg class="absolute bottom-0 right-0 w-32 h-32 opacity-10 transform translate-x-4 translate-y-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2 12h2v7H2v-7zm4-4h2v11H6V8zm4-4h2v15h-2V4zm4 6h2v9h-2v-9zm4-2h2v11h-2V8z"/></svg>
+          </div>
+
+          <!-- Stroke Risk Card -->
+          <div class="col-span-1 md:col-span-5 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-36 h-36 rounded-full blur-3xl opacity-35 bg-slate-200"></div>
+            <div class="relative z-10 flex flex-col h-full space-y-4">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">Nguy cơ đột quỵ AI</span>
+                <div class="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                </div>
+              </div>
+              <div class="py-6 space-y-1.5">
+                <p class="text-sm font-bold text-slate-800">Chưa có kết quả AI</p>
+                <p class="text-xs text-slate-400">Yêu cầu chạy tầm soát thông minh để nhận chỉ số phần trăm rủi ro.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clinical Flags Card -->
+          <div class="col-span-1 md:col-span-3 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm">
+            <div class="flex justify-between items-start mb-4">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">Tiền sử lâm sàng</span>
+              <div class="bg-slate-50 text-slate-500 p-2 rounded-2xl border border-slate-100">
+                <svg class="w-5 h-5 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+              </div>
+            </div>
+            <div class="py-6 text-center text-xs text-slate-400 italic">Hồ sơ trống - thiết lập các cờ bệnh lý để máy chủ AI tổng hợp.</div>
+          </div>
+        </div>
+
+        <!-- Chart + Advice -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Chart -->
+          <div class="col-span-1 lg:col-span-7 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                <div>
+                  <h3 class="text-sm font-bold text-indigo-950">Biểu đồ rủi ro mạch tim theo thời gian</h3>
+                  <p class="text-3xs text-slate-500">Nhật ký trực quan hóa biến thiên của các chỉ số rủi ro.</p>
+                </div>
+              </div>
+            </div>
+            <div class="h-56 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 text-center text-xs text-slate-500 space-y-1">
+              <svg class="w-8 h-8 text-slate-350 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              <p class="font-bold">Chưa tạo đủ lịch sử rủi ro</p>
+              <p class="text-3xs">Bạn cần hoàn thành tối thiểu 2 lần Tầm soát AI tại các thời điểm hoặc chỉ số khác nhau để vẽ đồ thị diễn biến.</p>
+            </div>
+          </div>
+
+          <!-- Advice -->
+          <div class="col-span-1 lg:col-span-5 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>
+                <span class="text-sm font-bold text-slate-800">Lời khuyên dự phòng lâm sàng</span>
+              </div>
+              <div class="py-12 text-center text-xs text-slate-400 italic">Điền hồ sơ sức khỏe và bắt đầu phân tích AI để hệ thống đưa ra phác đồ tập luyện cá nhân hóa tự động.</div>
+            </div>
+            <button onclick="switchTab('chatbot')" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition flex justify-center items-center gap-1.5 cursor-pointer mt-4">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Bắt đầu Hỏi đáp tư vấn trực tiếp
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: PROFILE -->
+      <div id="tab-profile" class="tab-content hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
+              <svg class="w-6 h-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+              Hồ sơ sức khỏe sinh học cá nhân
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Cấu hình đầy đủ các chỉ số dưới đây một cách kỹ lưỡng để hỗ trợ thuật toán đưa ra kết quả phân loại chính xác nhất.</p>
+          </div>
+
+          <!-- Live BMI Preview -->
+          <div class="p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div class="space-y-1">
+              <span class="text-3xs font-black text-indigo-600 uppercase tracking-wider block">Tính BMI Thời Gian Thực</span>
+              <p class="text-xs text-slate-500">Chỉ số sẽ tự động cập nhật dựa theo giá trị Chiều cao và Cân nặng bạn điều chỉnh bên dưới.</p>
+            </div>
+            <div class="text-center md:border-r md:border-l border-slate-200 md:py-2 px-4 space-y-0.5">
+              <span class="text-xs text-slate-400">BMI ước tính</span>
+              <span id="live-bmi" class="block text-3xl font-black text-indigo-950 font-mono">23.5</span>
+            </div>
+            <div class="text-center space-y-1">
+              <span class="text-xs text-slate-400">Phân loại sức khỏe</span>
+              <div><span id="live-bmi-label" class="inline-block px-3 py-1 text-xs font-extrabold border rounded-full text-emerald-600 bg-emerald-50 border-emerald-200">Bình thường</span></div>
+            </div>
+          </div>
+
+          <form onsubmit="handleSaveProfile(event)" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Age -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">Tuổi của bạn</label>
+                <input type="number" id="profile-age" min="1" max="120" value="45" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+              </div>
+              <!-- Gender -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">Giới tính</label>
+                <select id="profile-gender" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition">
+                  <option value="male">Nam</option>
+                  <option value="female">Nữ</option>
+                </select>
+              </div>
+              <!-- Height -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">Chiều cao (cm)</label>
+                <input type="number" id="profile-height" min="50" max="300" value="170" oninput="updateBmi()" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+              </div>
+              <!-- Weight -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">Cân nặng cơ thể (kg)</label>
+                <input type="number" id="profile-weight" min="3" max="400" value="68" oninput="updateBmi()" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition" />
+              </div>
+              <!-- Smoking -->
+              <div class="space-y-1.5 md:col-span-2">
+                <label class="text-xs font-extrabold text-slate-700 block">Trạng thái sử dụng thuốc lá</label>
+                <select id="profile-smoking" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none text-sm transition">
+                  <option value="never">Chưa từng sử dụng bao giờ</option>
+                  <option value="formerly">Đã từng hút trước đây (nay đã bỏ hoàn toàn)</option>
+                  <option value="smokes">Đang hút thuốc lá hằng ngày hoặc thường xuyên</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Pathological Toggles -->
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">Tiền sử chẩn đoán bệnh</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="hypertension-card" onclick="toggleHypertension()" class="p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition border-slate-100 bg-slate-50 text-slate-700 hover:border-slate-200">
+                  <div class="space-y-0.5">
+                    <span class="text-sm font-bold block text-slate-900">Tăng huyết áp / Huyết áp cao</span>
+                    <span class="block text-3xs text-slate-400">Bạn đã hoặc đang dùng thuốc ổn định huyết áp tâm thu &gt; 140.</span>
+                  </div>
+                  <div id="hypertension-check" class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-slate-350 text-transparent">
+                    <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                </div>
+                <div id="heart-disease-card" onclick="toggleHeartDisease()" class="p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition border-slate-100 bg-slate-50 text-slate-700 hover:border-slate-200">
+                  <div class="space-y-0.5">
+                    <span class="text-sm font-bold block text-slate-900">Tiền sử Bệnh mạch vành / Bệnh tim</span>
+                    <span class="block text-3xs text-slate-400">Bạn có tiền lệ hẹp mạch mạch vành, nhồi máu cơ tim, suy tim...</span>
+                  </div>
+                  <div id="heart-disease-check" class="w-6 h-6 rounded-full flex items-center justify-center border-2 border-slate-350 text-transparent">
+                    <svg class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Cập nhật Hồ sơ Sinh học
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 3: PREDICT -->
+      <div id="tab-predict" class="tab-content hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 space-y-6 shadow-sm">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
+              <svg class="w-6 h-6 text-indigo-600 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              Đánh giá nguy cơ đột quỵ tích hợp AI
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Gửi trực tiếp các chỉ số sinh học hiện tại của bạn đến AI để thực hiện phân tích rủi ro tắc/vỡ mạch máu não sâu.</p>
+          </div>
+
+          <!-- Warning: No profile -->
+          <div class="p-5 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-3">
+            <svg class="w-12 h-12 text-amber-500 mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <div>
+              <h4 class="text-base font-bold text-amber-900">Cần thiết lập Hồ sơ Sức khỏe trước</h4>
+              <p class="text-xs text-amber-800 mt-1">Để phân tích nguy cơ đột quỵ chính xác, bạn cần điền đầy đủ hồ sơ sức khỏe bao gồm chiều cao, cân nặng và tiền sử bệnh lý.</p>
+            </div>
+            <button onclick="switchTab('profile')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl cursor-pointer transition">
+              Hoàn thiện Hồ sơ ngay
+            </button>
+          </div>
+
+          <!-- Tip card -->
+          <div class="p-4 bg-indigo-50/50 border border-indigo-100 max-w-2xl mx-auto rounded-xl text-3xs text-indigo-700 leading-relaxed">
+            💡 <strong>Mẹo an toàn:</strong> Động cơ AI của chúng tôi sẽ phân tích tích hợp dựa trên tuổi tác, BMI, các nhân tố bệnh mạch vành hiện diện kết hợp cùng hàng nghìn dữ liệu mẫu nghiên cứu của WHO để đưa ra kết quả rủi ro thực chất.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: HISTORY -->
+      <div id="tab-history" class="tab-content hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
+              <svg class="w-6 h-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              Lịch sử đánh giá nguy cơ
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Tất cả kết quả Tầm soát AI được lưu trữ và theo dõi theo thời gian.</p>
+          </div>
+          <div class="py-16 text-center text-slate-400 space-y-2">
+            <svg class="w-12 h-12 mx-auto text-slate-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <p class="text-sm font-bold text-slate-500">Chưa có lịch sử tầm soát</p>
+            <p class="text-xs">Hoàn thiện hồ sơ sức khỏe và chạy tầm soát để lưu trữ lịch sử theo dõi.</p>
+          </div>
+          <div class="flex items-center gap-2 text-3xs bg-slate-50 text-slate-500 px-4 py-3 rounded-xl border border-slate-100">
+            <svg class="w-4 h-4 text-slate-400 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Lịch sử trên ghi trữ trực tiếp trên tập tin máy chủ. Sẽ tiếp tục ở lại tài khoản và hiển thị trên mọi thiết bị bạn đăng nhập.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: CHATBOT -->
+      <div id="tab-chatbot" class="tab-content hidden">
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col overflow-hidden" style="height:580px">
+          <!-- Header -->
+          <div class="bg-slate-50 border-b border-indigo-50/50 p-4 shrink-0 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="relative">
+                <div class="bg-emerald-500 text-white p-2.5 rounded-xl shadow-inner">
+                  <svg class="w-5 h-5 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                </div>
+                <span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-white"></span>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Trợ lý Đột quỵ & Tim mạch</h3>
+                <p class="text-3xs text-emerald-600 font-medium tracking-wide">Trực tuyến hỗ trợ giải quyết thắc mắc 24/7</p>
+              </div>
+            </div>
+            <button onclick="clearChat()" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition" title="Xóa cuộc đối thoại">
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+
+          <!-- Chat Messages -->
+          <div id="chat-messages" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50/40">
+            <!-- Welcome Message -->
+            <div class="flex gap-3 max-w-[85%] mr-auto">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              </div>
+              <div class="space-y-1">
+                <div class="p-3.5 rounded-2xl rounded-tl-none border bg-white border-slate-200 text-slate-800 text-xs shadow-sm leading-relaxed">
+                  Chào mừng bạn đến với <strong>Health Guardian AI</strong>! 👋<br/><br/>
+                  Tôi là trợ lý AI chuyên theo dõi tim mạch và đề phòng nguy cơ tai biến mạch máu não. Bạn có thể hỏi tôi bất cứ vấn đề gì liên quan đến:
+                  <div class="mt-2 space-y-1">
+                    <div class="flex gap-2"><span class="text-indigo-500 font-bold">•</span><span>Thực đơn dinh dưỡng lành mạnh chống cao huyết áp đột ngột.</span></div>
+                    <div class="flex gap-2"><span class="text-indigo-500 font-bold">•</span><span>Thiết lập mục tiêu luyện tập hồi phục hoặc tăng sức bền thành mạch.</span></div>
+                    <div class="flex gap-2"><span class="text-indigo-500 font-bold">•</span><span>Hướng dẫn chi tiết dấu hiệu cảnh báo lâm sàng đột quỵ theo chuẩn <strong>FAST</strong>.</span></div>
+                    <div class="flex gap-2"><span class="text-indigo-500 font-bold">•</span><span>Lên lịch báo uống thuốc hoặc đo huyết áp hằng ngày.</span></div>
+                  </div>
+                </div>
+                <span class="block text-3xs text-slate-400 font-mono text-left" id="welcome-time"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Suggestions -->
+          <div class="p-2 bg-slate-50 border-t border-slate-100 overflow-x-auto flex gap-1.5 shrink-0 select-none">
+            <button onclick="sendQuickMessage('Cách xử trí nhanh khi thấy người bị méo miệng và liệt một bên chân tay?')" class="px-2.5 py-1 text-xs bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 rounded-full shadow-sm transition cursor-pointer whitespace-nowrap shrink-0">Méo miệng &amp; Liệt chi thì làm gì?</button>
+            <button onclick="sendQuickMessage('Thực đơn ăn kiêng lành mạnh để cải thiện cao huyết áp hằng ngày là gì?')" class="px-2.5 py-1 text-xs bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 rounded-full shadow-sm transition cursor-pointer whitespace-nowrap shrink-0">Thực đơn hạ huyết áp</button>
+            <button onclick="sendQuickMessage('Làm sao để cai thuốc lá thành công tránh xơ vữa động mạch?')" class="px-2.5 py-1 text-xs bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 rounded-full shadow-sm transition cursor-pointer whitespace-nowrap shrink-0">Bỏ thuốc lá chống đột quỵ</button>
+            <button onclick="sendQuickMessage('Khuyên tôi cường độ và tần suất tập thể dục thích hợp cho người có triệu chứng mạch vành?')" class="px-2.5 py-1 text-xs bg-white hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-slate-200 rounded-full shadow-sm transition cursor-pointer whitespace-nowrap shrink-0">Tập thể dục cho người bệnh tim</button>
+          </div>
+
+          <!-- Input -->
+          <div class="p-3 bg-white border-t border-slate-200 flex gap-2 shrink-0">
+            <input type="text" id="chat-input" placeholder="Hãy đặt câu hỏi về tim mạch, huyết áp, thực đơn nước uống hoặc thuốc lá..." class="flex-1 px-4 py-3 border border-slate-200 rounded-xl outline-none text-xs focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 transition bg-slate-50 focus:bg-white" onkeydown="if(event.key==='Enter') sendChatMessage()" />
+            <button onclick="sendChatMessage()" class="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-md cursor-pointer">Gửi tin</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  // ---- Tab Switching ----
+  function switchTab(tab) {
+    ['dashboard','profile','predict','history','chatbot'].forEach(t => {
+      document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+      document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
+      document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
+    });
+  }
+
+  // ---- Water Widget ----
+  function addWater() { waterGlasses = Math.min(waterGlasses + 1, 20); updateWaterDisplay(); }
+  function removeWater() { waterGlasses = Math.max(waterGlasses - 1, 0); updateWaterDisplay(); }
+  function updateWaterDisplay() { document.getElementById('water-count').textContent = waterGlasses; }
+
+  // ---- Reminders ----
+  function addReminder() {
+    const name = document.getElementById('new-med-name').value.trim();
+    const time = document.getElementById('new-med-time').value;
+    if (!name) return;
+    const list = document.getElementById('reminders-list');
+    const div = document.createElement('div');
+    div.className = 'flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 gap-1.5';
+    div.innerHTML = `<div class="flex items-start gap-1.5"><input type="checkbox" class="mt-1 accent-indigo-600 rounded" /><div><span class="block text-[0.7rem] font-bold text-slate-800">${name}</span><span class="text-[0.625rem] text-indigo-600 font-mono">${time}</span></div></div><button onclick="this.closest('div').remove()" class="text-slate-400 hover:text-red-500 p-1 rounded"><svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+    list.appendChild(div);
+    document.getElementById('new-med-name').value = '';
+  }
+
+  // ---- Profile: BMI ----
+  function updateBmi() {
+    const h = parseFloat(document.getElementById('profile-height').value) || 170;
+    const w = parseFloat(document.getElementById('profile-weight').value) || 68;
+    const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+    document.getElementById('live-bmi').textContent = bmi;
+    let label, cls;
+    if (bmi < 18.5) { label = 'Thiếu cân'; cls = 'text-sky-600 bg-sky-50 border-sky-200'; }
+    else if (bmi < 25) { label = 'Bình thường'; cls = 'text-emerald-600 bg-emerald-50 border-emerald-200'; }
+    else if (bmi < 30) { label = 'Thừa cân'; cls = 'text-orange-600 bg-orange-50 border-orange-200'; }
+    else { label = 'Béo phì (Báo động)'; cls = 'text-red-700 bg-red-50 border-red-200'; }
+    const lbl = document.getElementById('live-bmi-label');
+    lbl.textContent = label;
+    lbl.className = `inline-block px-3 py-1 text-xs font-extrabold border rounded-full ${cls}`;
+  }
+
+  function toggleHypertension() {
+    hypertension = !hypertension;
+    const card = document.getElementById('hypertension-card');
+    const chk = document.getElementById('hypertension-check');
+    card.className = `p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition ${hypertension ? 'border-red-400 bg-red-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`;
+    chk.className = `w-6 h-6 rounded-full flex items-center justify-center border-2 ${hypertension ? 'bg-red-500 border-red-500' : 'border-slate-300 text-transparent'}`;
+  }
+
+  function toggleHeartDisease() {
+    heartDisease = !heartDisease;
+    const card = document.getElementById('heart-disease-card');
+    const chk = document.getElementById('heart-disease-check');
+    card.className = `p-4 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition ${heartDisease ? 'border-red-400 bg-red-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`;
+    chk.className = `w-6 h-6 rounded-full flex items-center justify-center border-2 ${heartDisease ? 'bg-red-500 border-red-500' : 'border-slate-300 text-transparent'}`;
+  }
+
+  function handleSaveProfile(e) {
+    e.preventDefault();
+    alert('Hồ sơ sức khỏe đã được lưu thành công! (Demo - kết nối API để lưu thực tế)');
+  }
+
+  // ---- Chatbot ----
+  function setWelcomeTime() {
+    const t = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const el = document.getElementById('welcome-time');
+    if (el) el.textContent = t;
+  }
+
+  function sendQuickMessage(msg) {
+    document.getElementById('chat-input').value = msg;
+    sendChatMessage();
+  }
+
+  function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    appendChatMessage('user', msg);
+    setTimeout(() => {
+      const responses = [
+        'Cảm ơn bạn đã đặt câu hỏi. Đây là giao diện demo, trong phiên bản thực tế câu trả lời sẽ được tạo bởi AI Gemini chuyên sâu về tim mạch và đột quỵ.',
+        'Vấn đề bạn đề cập rất quan trọng. Tôi khuyên bạn nên tham khảo ý kiến bác sĩ chuyên khoa tim mạch để được tư vấn chi tiết hơn.',
+        'Theo nghiên cứu y khoa, đây là một trong những yếu tố nguy cơ quan trọng. Hãy duy trì lối sống lành mạnh và theo dõi sức khỏe thường xuyên.'
+      ];
+      appendChatMessage('model', responses[Math.floor(Math.random() * responses.length)]);
+    }, 1000);
+  }
+
+  function appendChatMessage(role, content) {
+    const container = document.getElementById('chat-messages');
+    const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    const isUser = role === 'user';
+    const div = document.createElement('div');
+    div.className = `flex gap-3 max-w-[85%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`;
+    div.innerHTML = `
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${isUser ? 'bg-indigo-600' : 'bg-emerald-500'} text-white">
+        ${isUser
+          ? `<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>`
+          : `<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`
+        }
+      </div>
+      <div class="space-y-1">
+        <div class="p-3.5 rounded-2xl border text-xs leading-relaxed ${isUser ? 'bg-indigo-600 border-indigo-700 text-white rounded-tr-none' : 'bg-white border-slate-200 text-slate-800 rounded-tl-none'}">${content}</div>
+        <span class="block text-[0.625rem] text-slate-400 font-mono ${isUser ? 'text-right' : 'text-left'}">${time}</span>
+      </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function clearChat() {
+    if (confirm('Xóa lịch sử cuộc đối thoại trợ lý tim mạch hiện tại?')) {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML = '';
+      appendChatMessage('model', 'Lịch sử trò chuyện đã được thiết lập lại dọn dẹp. Tôi có thể hỗ trợ gì cho sức khỏe tim mạch của bạn?');
+    }
+  }
+
+  // Init
+  setWelcomeTime();
+  updateBmi();
+</script>
+</body>
+</html>

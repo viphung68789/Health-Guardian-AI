@@ -1,0 +1,171 @@
+﻿@model Health_Guardian_AI.Models.SaveProfileRequest;
+<!-- Bento Cards -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <!-- BMI Card -->
+    <div class="col-span-1 md:col-span-4 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-3xl p-6 relative overflow-hidden shadow-md shadow-blue-100">
+        <div class="relative z-10 flex flex-col h-full space-y-4">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold uppercase tracking-wider opacity-80 font-display">Chỉ số hình thể (BMI)</span>
+                <div class="bg-white/10 backdrop-blur-md p-2.5 rounded-2xl">
+                    <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+                </div>
+            </div>
+            <div id="">
+                @if (ViewBag.UserBMI == null)
+                {
+                    <div class="py-6 space-y-1.5 text-white/90">
+                        <p class="text-sm font-bold">Chưa thiết lập BMI</p>
+                        <p class="text-xs opacity-80">Hãy cập nhật cân nặng và chiều cao ở tab Hồ sơ.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="py-6 space-y-1.5 text-white/90 text-4xl">
+                        <p>@ViewBag.UserBMI</p>
+                        @if ((double)ViewBag.UserBMI < 18.5)
+                        {
+                            <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-sky-600 bg-sky-50 border-sky-200">Thiếu cân</p>
+                        }
+                        else if ((double)ViewBag.UserBMI < 25)
+                        {
+                            <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-emerald-600 bg-emerald-50 border-emerald-200">Bình thường</p>
+                        }
+                        else if ((double)ViewBag.UserBMI < 30)
+                        {
+                            <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-orange-600 bg-orange-50 border-orange-200">Thừa cân</p>
+                        }
+                        else
+                        {
+                            <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-red-700 bg-red-50 border-red-200">Béo phì (Báo động)</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <svg class="absolute bottom-0 right-0 w-32 h-32 opacity-10 transform translate-x-4 translate-y-4" fill="currentColor" viewBox="0 0 24 24"><path d="M2 12h2v7H2v-7zm4-4h2v11H6V8zm4-4h2v15h-2V4zm4 6h2v9h-2v-9zm4-2h2v11h-2V8z" /></svg>
+    </div>
+
+    <!-- Stroke Risk Card -->
+    <div class="col-span-1 md:col-span-5 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-36 h-36 rounded-full blur-3xl opacity-35 bg-slate-200"></div>
+        <div class="relative z-10 flex flex-col h-full space-y-4">
+            <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">Nguy cơ đột quỵ do AI tính ra gần nhất </span>
+                <div class="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+                </div>
+            </div>
+            @if (ViewBag.Problem != null)
+            {
+                <div class="py-6 space-y-1.5">
+                    <p class="text-4xl font-bold text-slate-800">@ViewBag.Problem %</p>
+                    @if ((double)ViewBag.Problem <= 40)
+                    {
+                        <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-sky-600 bg-sky-50 border-sky-200">Rất tốt</p>
+                    }
+                    else if ((double)ViewBag.Problem <= 60)
+                    {
+                        <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-orange-600 bg-orange-50 border-orange-200">Cẩn thận</p>
+                    }
+                    else if ((double)ViewBag.Problem <= 80)
+                    {
+                        <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-orange-600 bg-orange-50 border-orange-200">Nguy hiểm</p>
+                    }
+                    else
+                    {
+                        <p class="inline-block px-3 py-1 text-base font-extrabold border rounded-full text-red-700 bg-red-50 border-red-200">Nghiêm trọng(Báo động)</p>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="py-6 space-y-1.5">
+                    <p class="text-sm font-bold text-slate-800">Chưa có kết quả AI</p>
+                    <p class="text-xs text-slate-400">Yêu cầu chạy tầm soát thông minh để nhận chỉ số phần trăm rủi ro.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Clinical Flags Card -->
+    <div class="col-span-1 md:col-span-3 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm">
+        <div class="flex justify-between items-start mb-4">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-display">Nguyên nhân chủ yếu</span>
+            <div class="bg-slate-50 text-slate-500 p-2 rounded-2xl border border-slate-100">
+                <svg class="w-5 h-5 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" /><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" /><circle cx="20" cy="10" r="2" /></svg>
+            </div>
+        </div>
+        @if (ViewBag.fact_1 == null)
+        {
+            <div class="py-6 text-center text-xs text-slate-400 italic">Hồ sơ trống - thiết lập các cờ bệnh lý để máy chủ AI tổng hợp.</div>
+        }
+        else if (ViewBag.fact_1 == "")
+        {
+            <div class="text-lg font-bold text-slate-800">Chưa có những nguyên nhân rõ ràng</div>
+        }
+        else
+        {
+            <div class="text-lg font-bold text-slate-800">@TranslateFactor(ViewBag.fact_1)</div>
+            <div class="text-lg font-bold text-slate-800">@TranslateFactor(ViewBag.fact_2)</div>
+        }
+    </div>
+</div>
+
+<!-- Chart + Advice -->
+<div class="m-2">
+    <!-- Chart -->
+    <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm">
+        <div class="flex justify-between items-center pb-4 border-b border-slate-100 mb-4">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>
+                <div>
+                    <h3 class="text-sm font-bold text-indigo-950">Biểu đồ rủi ro đột quỵ theo thời gian</h3>
+                    <p class="text-3xs text-slate-500">Nhật ký trực quan hóa biến thiên của các chỉ số rủi ro.</p>
+                </div>
+            </div>
+        </div>
+        <div class="m-2 bg-slate-50 border border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 text-center text-xs text-slate-500 space-y-1">
+            @* <svg class="w-8 h-8 text-slate-350 mb-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg> *@
+            @* <p class="font-bold">Chưa tạo đủ lịch sử rủi ro</p>
+            <p class="text-3xs">Bạn cần hoàn thành tối thiểu 2 lần Tầm soát AI tại các thời điểm hoặc chỉ số khác nhau để vẽ đồ thị diễn biến.</p> *@
+            <div class="w-full overflow-x-auto relative">
+                <canvas id="MyChart" style="height:300px"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advice -->
+    <div class="  bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col justify-between">
+        <div class="space-y-3">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" /><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" /><circle cx="20" cy="10" r="2" /></svg>
+                <span class="text-sm font-bold text-slate-800">Lời khuyên dự phòng lâm sàng</span>
+            </div>
+                <div id="health-advice-result-1"></div>
+                @* <div id="health-advice-result-2" class="py-12 text-center text-xs text-slate-400 italic">Điền hồ sơ sức khỏe và bắt đầu phân tích AI để hệ thống đưa ra phác đồ tập luyện cá nhân hóa tự động.</div>             *@
+        </div>
+        <button onclick="switchTab('chatbot')" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-xl transition flex justify-center items-center gap-1.5 cursor-pointer mt-4">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+            Bắt đầu Hỏi đáp tư vấn trực tiếp
+        </button>
+    </div>
+</div>
+@*Hàm dịch dữ liệu để người dùng dễ hiểu hơn(Cảm ơn bạn Nguyễn Hoàng Long đã giúp đỡ rất nhiều trong quá trình code, phân tích dữ liệu và đưa ra ý tưởng.)*@
+@functions {
+    public string TranslateFactor(string factor)
+    {
+        return factor switch
+        {
+            "Age" => "Tuổi",
+            "Hypertension" => "Tăng huyết áp",
+            "Heart_Disease" => "Bệnh tim",
+            "BMI" => "BMI",
+            "Avg_Glucose" => "Đường huyết trung bình",
+            "Diabetes" => "Tiểu đường",
+            "Gender" => "Giới tính",
+            "SES" => "Tình trạng kinh tế - xã hội",
+            "Smoking_Status" => "Tình trạng hút thuốc",
+            _ => factor
+        };
+    }
+}
