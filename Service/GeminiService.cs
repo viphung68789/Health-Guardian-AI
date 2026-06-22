@@ -5,9 +5,9 @@ namespace Health_Guardian_AI.Service
 {
     public class GeminiService
     {
-        private readonly string _apiKey = "AQ.Ab8RN6IJYXF46OqvG4jJXA4oeFDlCUD1ja0ic-VlS-3ba4oC-w";
+        private readonly string _apiKey = "";
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+        private const string BaseUrl = "";
         private readonly MarkdownService _md;
         private readonly GeminiService _gemini;
 
