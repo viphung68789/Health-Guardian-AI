@@ -7,7 +7,7 @@ namespace Health_Guardian_AI.Service
     {
         private readonly string _apiKey = "";
         private readonly HttpClient _httpClient;
-        private const string BaseUrl = "";
+        private const string BaseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
         private readonly MarkdownService _md;
         private readonly GeminiService _gemini;
 
